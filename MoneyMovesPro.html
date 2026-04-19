@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Money Moves Pro</title>
+  <style>
+    :root {
+      --bg: #f5f8fc;
+      --bg-alt: #e6edf6;
+      --panel: rgba(255, 255, 255, 0.92);
+      --panel-solid: #ffffff;
+      --text: #0b1220;
+      --muted: #64748b;
+      --border: rgba(15, 23, 42, 0.08);
+      --primary: #163f72;
+      --primary-2: #0f9d8a;
+      --success: #15803d;
+      --warning: #c47f00;
+      --danger: #b42318;
+      --shadow: 0 24px 60px rgba(15, 23, 42, 0.1);
+      --radius: 24px;
+    }
+
+    [data-theme="dark"] {
+      --bg: #07111d;
+      --bg-alt: #0f1b2e;
+      --panel: rgba(10, 18, 32, 0.88);
+      --panel-solid: #0b1324;
+      --text: #e7eefc;
+      --muted: #98a7be;
+      --border: rgba(148, 163, 184, 0.14);
+      --primary: #7fb1ff;
+      --primary-2: #3fd0c0;
+      --shadow: 0 24px 60px rgba(0, 0, 0, 0.32);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top left, rgba(22, 63, 114, 0.15), transparent 30%),
+        radial-gradient(circle at top right, rgba(15, 157, 138, 0.14), transparent 26%),
+        linear-gradient(135deg, var(--bg), var(--bg-alt));
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), transparent 80%);
+    }
+
+    button,
+    input,
+    select {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    body[data-authenticated="false"] .app-shell {
+      display: none;
+    }
+
+    body[data-authenticated="true"] .auth-shell {
+      display: none;
+    }
+
+    .auth-shell {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .auth-card {
+      width: min(100%, 520px);
+      padding: 32px;
+      border-radius: 30px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .auth-brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 26px;
+    }
+
+    .auth-copy h2,
+    .auth-copy p {
+      margin: 0;
+    }
+
+    .auth-copy h2 {
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      margin-bottom: 10px;
+    }
+
+    .auth-copy p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .auth-form {
+      display: grid;
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .auth-form label {
+      display: grid;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .auth-form input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel-solid);
+      color: var(--text);
+      padding: 13px 14px;
+      outline: none;
+    }
+
+    .auth-message {
+      min-height: 22px;
+      font-size: 0.94rem;
+      color: var(--muted);
+    }
+
+    .auth-message.success {
+      color: var(--success);
+    }
+
+    .auth-message.error {
+      color: var(--danger);
+    }
+
+    .auth-actions {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .auth-footnote {
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .user-chip-wrap {
+      display: flex;
+    }
+
+    body[data-authenticated="true"] .app-shell {
+      display: grid;
+    }
+
+    .app-shell {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 24px;
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 24px;
+      align-self: start;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 24px;
+      border-radius: var(--radius);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      color: white;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      box-shadow: 0 18px 30px rgba(22, 63, 114, 0.24);
+    }
+
+    .brand-block h1,
+    .topbar h2,
+    .panel-header h3 {
+      margin: 0;
+      line-height: 1.1;
+    }
+
+    .brand-block p,
+    .subtitle,
+    .sidebar-copy,
+    .stat-meta,
+    .section-label,
+    .eyebrow,
+    .chart-header,
+    .metric-card span,
+    .transaction-date,
+    .transaction-category,
+    .sidebar-card-label,
+    .topbar-stats,
+    .transaction-meta {
+      color: var(--muted);
+    }
+
+    .brand-block p,
+    .sidebar-copy,
+    .subtitle,
+    .stat-meta,
+    .section-label,
+    .eyebrow,
+    .sidebar-card-label,
+    .chart-header,
+    .metric-card span {
+      margin: 0;
+      font-size: 0.92rem;
+    }
+
+    .sidebar-nav {
+      display: grid;
+      gap: 10px;
+    }
+
+    .nav-link,
+    .ghost-btn,
+    .danger-btn,
+    .primary-btn,
+    .remove-btn,
+    .metric-card,
+    .stat-card,
+    .panel,
+    .sidebar-card,
+    .transaction-item {
+      border: 1px solid var(--border);
+    }
+
+    .nav-link {
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: transparent;
+      color: var(--text);
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
+
+    .nav-link.active,
+    .nav-link:hover {
+      transform: translateX(4px);
+      background: rgba(22, 63, 114, 0.08);
+      border-color: rgba(22, 63, 114, 0.16);
+    }
+
+    .sidebar-card {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .mini-chip.accent {
+      color: var(--primary);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 12px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      background: rgba(21, 128, 61, 0.12);
+      color: var(--success);
+    }
+
+    .sidebar-actions {
+      display: grid;
+      gap: 10px;
+    }
+
+    .ghost-btn,
+    .danger-btn,
+    .primary-btn,
+    .remove-btn {
+      padding: 12px 14px;
+      border-radius: 14px;
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
+
+    .ghost-btn {
+      background: rgba(255, 255, 255, 0.42);
+      color: var(--text);
+    }
+
+    .ghost-btn:hover,
+    .primary-btn:hover,
+    .danger-btn:hover,
+    .remove-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .danger-btn {
+      background: rgba(220, 38, 38, 0.08);
+      color: var(--danger);
+    }
+
+    .main-content {
+      display: grid;
+      gap: 22px;
+    }
+
+    .topbar,
+    .summary-grid,
+    .content-grid,
+    .transactions-panel {
+      position: relative;
+      z-index: 1;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      padding: 6px 2px 0;
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      font-size: 0.76rem;
+      margin-bottom: 10px;
+    }
+
+    .topbar h2 {
+      font-size: clamp(2rem, 3vw, 3.2rem);
+      max-width: 12ch;
+    }
+
+    .subtitle {
+      max-width: 56ch;
+      margin-top: 10px;
+    }
+
+    .topbar-stats {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .mini-chip {
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      font-weight: 600;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .stat-card,
+    .panel {
+      background: var(--panel);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+    }
+
+    .summary-grid .stat-card {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .summary-grid .stat-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 5px;
+      background: linear-gradient(180deg, var(--primary), var(--primary-2));
+    }
+
+    .summary-grid .stat-card:nth-child(2)::before {
+      background: linear-gradient(180deg, #0f9d8a, #53b6c5);
+    }
+
+    .summary-grid .stat-card:nth-child(3)::before {
+      background: linear-gradient(180deg, #c47f00, #f0b24d);
+    }
+
+    .summary-grid .stat-card:nth-child(4)::before {
+      background: linear-gradient(180deg, #15803d, #47b26e);
+    }
+
+    .stat-card {
+      padding: 24px;
+      min-height: 190px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .primary-card {
+      background: linear-gradient(145deg, rgba(37, 99, 235, 0.18), rgba(20, 184, 166, 0.16)), var(--panel);
+    }
+
+    .stat-label,
+    .stat-value {
+      font-weight: 700;
+    }
+
+    .stat-value {
+      font-size: clamp(1.35rem, 2.3vw, 2.05rem);
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      overflow-wrap: anywhere;
+    }
+
+    .budget-form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .budget-form input,
+    .expense-form input,
+    .expense-form select,
+    .filters input,
+    .filters select {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--panel-solid);
+      color: var(--text);
+      padding: 12px 14px;
+      outline: none;
+    }
+
+    .budget-form button,
+    .primary-btn {
+      border: 0;
+      background: linear-gradient(135deg, var(--primary), var(--primary-2));
+      color: #fff;
+    }
+
+    .progress-card {
+      align-items: center;
+      justify-content: center;
+    }
+
+    .progress-ring-wrap {
+      display: grid;
+      place-items: center;
+      width: 100%;
+    }
+
+    .progress-ring {
+      --pct: 0;
+      width: 132px;
+      height: 132px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 1.25rem;
+      font-weight: 800;
+      background: conic-gradient(var(--primary) calc(var(--pct) * 1%), rgba(148, 163, 184, 0.18) 0);
+      position: relative;
+    }
+
+    .progress-ring::after {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      background: var(--panel-solid);
+      border: 1px solid var(--border);
+    }
+
+    .progress-ring span {
+      position: relative;
+      z-index: 1;
+    }
+
+    .progress-caption {
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 18px;
+    }
+
+    .panel {
+      padding: 24px;
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .panel-header-row {
+      flex-wrap: wrap;
+    }
+
+    .expense-form {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .expense-form label {
+      display: grid;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    .expense-form button {
+      grid-column: 1 / -1;
+      margin-top: 4px;
+    }
+
+    .analytics-cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .metric-card {
+      padding: 18px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(22, 63, 114, 0.05), rgba(15, 157, 138, 0.03));
+      display: grid;
+      gap: 6px;
+    }
+
+    .metric-card strong {
+      font-size: 1rem;
+      line-height: 1.2;
+    }
+
+    .chart-panel {
+      padding: 18px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(22, 63, 114, 0.03), rgba(15, 157, 138, 0.04));
+      border: 1px solid var(--border);
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 18px;
+      font-weight: 600;
+    }
+
+    .chart-body {
+      display: grid;
+      grid-template-columns: 210px 1fr;
+      gap: 18px;
+      align-items: center;
+    }
+
+    .pie-chart {
+      width: 210px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: conic-gradient(var(--primary) 0 0);
+      box-shadow: inset 0 0 0 14px rgba(255, 255, 255, 0.26);
+    }
+
+    .legend-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: var(--panel-solid);
+      border: 1px solid var(--border);
+    }
+
+    .legend-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .legend-swatch {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      flex: 0 0 auto;
+    }
+
+    .legend-name {
+      font-weight: 600;
+    }
+
+    .legend-value {
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .transactions-panel {
+      display: grid;
+      gap: 18px;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 1.2fr 0.9fr 0.8fr;
+      gap: 12px;
+      min-width: min(100%, 640px);
+    }
+
+    .transaction-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .transaction-item {
+      display: grid;
+      grid-template-columns: 56px minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 16px;
+      border-radius: 20px;
+      background: var(--panel-solid);
+      animation: slideUp 0.28s ease both;
+    }
+
+    .transaction-item.highlight {
+      border-color: rgba(196, 127, 0, 0.34);
+      box-shadow: 0 14px 30px rgba(196, 127, 0, 0.1);
+    }
+
+    .transaction-item.empty {
+      grid-template-columns: 1fr;
+      text-align: center;
+      padding: 42px 18px;
+      color: var(--muted);
+    }
+
+    .transaction-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-size: 1.4rem;
+      background: rgba(22, 63, 114, 0.1);
+    }
+
+    .transaction-main {
+      min-width: 0;
+    }
+
+    .transaction-topline,
+    .transaction-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .transaction-name,
+    .transaction-amount {
+      font-weight: 700;
+    }
+
+    .transaction-amount {
+      font-size: 0.95rem;
+      white-space: nowrap;
+    }
+
+    .remove-btn {
+      background: rgba(220, 38, 38, 0.08);
+      color: var(--danger);
+    }
+
+    .form-panel,
+    .analytics-panel,
+    .transactions-panel {
+      border-color: rgba(22, 63, 114, 0.08);
+    }
+
+    .primary-btn,
+    .budget-form button {
+      box-shadow: 0 16px 28px rgba(22, 63, 114, 0.18);
+    }
+
+    .primary-btn:hover,
+    .budget-form button:hover {
+      box-shadow: 0 18px 32px rgba(22, 63, 114, 0.24);
+    }
+
+    .safe-text {
+      color: var(--success);
+    }
+
+    .warn-text {
+      color: var(--warning);
+    }
+
+    .danger-text {
+      color: var(--danger);
+    }
+
+    .fade-in {
+      animation: slideUp 0.28s ease both;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 1280px) {
+      .app-shell,
+      .content-grid,
+      .summary-grid,
+      .chart-body {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .topbar-stats {
+        justify-content: flex-start;
+      }
+
+      .filters {
+        min-width: 0;
+        width: 100%;
+        grid-template-columns: 1fr;
+      }
+
+      .analytics-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .app-shell {
+        padding: 14px;
+      }
+
+      .sidebar,
+      .panel,
+      .stat-card {
+        padding: 18px;
+      }
+
+      .expense-form,
+      .budget-form,
+      .transaction-item,
+      .transaction-topline,
+      .transaction-meta {
+        grid-template-columns: 1fr;
+      }
+
+      .transaction-item {
+        grid-template-columns: 1fr;
+      }
+
+      .transaction-topline,
+      .transaction-meta {
+        display: flex;
+      }
+
+      .chart-body {
+        gap: 14px;
+      }
+
+      .pie-chart {
+        width: min(100%, 210px);
+        margin: 0 auto;
+      }
+    }
+  </style>
+</head>
+<body data-authenticated="false">
+  <section id="authShell" class="auth-shell">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="brand-mark">MM</div>
+        <div>
+          <h1>Money Moves Pro</h1>
+          <p>Secure local dashboard access</p>
+        </div>
+      </div>
+
+      <div class="auth-copy">
+        <h2>Login to your finance workspace</h2>
+        <p>Sign in to view your PKR budget, expenses, and reports. New users can create a local account instantly.</p>
+      </div>
+
+      <form id="authForm" class="auth-form">
+        <label>
+          Email address
+          <input id="authEmail" type="email" placeholder="you@example.com" required />
+        </label>
+        <label>
+          Password
+          <input id="authPassword" type="password" placeholder="Enter password" required />
+        </label>
+
+        <div id="authMessage" class="auth-message" aria-live="polite"></div>
+
+        <div class="auth-actions">
+          <button id="loginBtn" type="submit" class="primary-btn">Login</button>
+          <button id="signupBtn" type="button" class="ghost-btn">Create account</button>
+        </div>
+      </form>
+
+      <p class="auth-footnote">This login is stored locally in your browser for offline use.</p>
+    </div>
+  </section>
+
+  <div id="appShell" class="app-shell">
+    <aside class="sidebar">
+      <div class="brand-block">
+        <div class="brand-mark">MM</div>
+        <div>
+          <h1>Money Moves Pro</h1>
+          <p>Fintech budget dashboard</p>
+        </div>
+      </div>
+
+      <div class="user-chip-wrap">
+        <div id="currentUserLabel" class="mini-chip accent">Not signed in</div>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Primary">
+        <button class="nav-link active" data-scroll-target="dashboardSection">Dashboard</button>
+        <button class="nav-link" data-scroll-target="expensesSection">Expenses</button>
+        <button class="nav-link" data-scroll-target="reportsSection">Reports</button>
+      </nav>
+
+      <div class="sidebar-card">
+        <div class="sidebar-card-label">Spending status</div>
+        <div id="statusBadge" class="status-badge">Safe spending</div>
+        <p id="statusSummary" class="sidebar-copy">Your current balance is healthy and within budget.</p>
+      </div>
+
+      <div class="sidebar-actions">
+        <button id="themeToggle" class="ghost-btn">Toggle dark mode</button>
+        <button id="resetMonthBtn" class="ghost-btn">Monthly reset</button>
+        <button id="exportBtn" class="ghost-btn">Backup data</button>
+        <button id="logoutBtn" class="ghost-btn">Logout</button>
+        <button id="clearBtn" class="danger-btn">Clear data</button>
+        <button id="switchAccountBtn" class="ghost-btn">Switch account</button>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <section class="topbar">
+        <div>
+          <p class="eyebrow">Advanced budget tracking</p>
+          <h2>Keep every PKR under control</h2>
+          <p class="subtitle">Track spending, compare against budget, and get instant financial insights.</p>
+        </div>
+        <div class="topbar-stats">
+          <div class="mini-chip" id="monthChip">This month</div>
+          <div class="mini-chip accent" id="budgetModeChip">Monthly budget</div>
+        </div>
+      </section>
+
+      <section id="dashboardSection" class="summary-grid">
+        <article class="stat-card primary-card">
+          <div class="stat-label">Total budget (PKR)</div>
+          <div class="stat-value" id="budgetValue">PKR 0</div>
+          <div class="stat-meta" id="budgetMeta">Set your monthly budget to begin</div>
+          <form id="budgetForm" class="budget-form">
+            <input id="budgetInput" type="number" min="0" step="0.01" placeholder="Enter budget amount in PKR" />
+            <button type="submit">Save</button>
+          </form>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-label">Total expenses (PKR)</div>
+          <div class="stat-value" id="expenseValue">PKR 0</div>
+          <div class="stat-meta" id="expenseMeta">Across all tracked transactions</div>
+        </article>
+
+        <article class="stat-card">
+          <div class="stat-label">Remaining balance (PKR)</div>
+          <div class="stat-value" id="remainingValue">PKR 0</div>
+          <div class="stat-meta" id="usageMeta">0% of your budget used</div>
+        </article>
+
+        <article class="stat-card progress-card">
+          <div class="stat-label">Budget usage</div>
+          <div class="progress-ring-wrap">
+            <div id="progressRing" class="progress-ring">
+              <span id="usagePercent">0%</span>
+            </div>
+          </div>
+          <div class="progress-caption" id="insightText">You are within budget</div>
+        </article>
+      </section>
+
+      <section class="content-grid">
+        <section id="expensesSection" class="panel form-panel">
+          <div class="panel-header">
+            <div>
+              <p class="section-label">Add expense</p>
+              <h3>Track a new transaction</h3>
+            </div>
+          </div>
+
+          <form id="expenseForm" class="expense-form">
+            <label>
+              Expense name
+              <input id="expenseName" type="text" placeholder="Lunch, ride, invoice..." required />
+            </label>
+            <label>
+              Amount
+              <input id="expenseAmount" type="number" min="0" step="0.01" placeholder="0.00" required />
+            </label>
+            <label>
+              Category
+              <select id="expenseCategory" required>
+                <option value="Food">Food</option>
+                <option value="Travel">Travel</option>
+                <option value="Shopping">Shopping</option>
+                <option value="Bills">Bills</option>
+                <option value="Education">Education</option>
+                <option value="Others">Others</option>
+              </select>
+            </label>
+            <label>
+              Date
+              <input id="expenseDate" type="date" required />
+            </label>
+            <button type="submit" class="primary-btn">Add expense</button>
+          </form>
+        </section>
+
+        <section id="reportsSection" class="panel analytics-panel">
+          <div class="panel-header">
+            <div>
+              <p class="section-label">Reports</p>
+              <h3>Analytics and spending intelligence</h3>
+            </div>
+          </div>
+
+          <div class="analytics-cards">
+            <article class="metric-card">
+              <span>Most spending category</span>
+              <strong id="topCategory">None yet</strong>
+            </article>
+            <article class="metric-card">
+              <span>Category breakdown</span>
+              <strong id="categoryCount">0 categories</strong>
+            </article>
+          </div>
+
+          <div class="chart-panel">
+            <div class="chart-header">
+              <span>Category distribution</span>
+              <span id="chartHint">No data available</span>
+            </div>
+            <div class="chart-body">
+              <div id="pieChart" class="pie-chart" aria-label="Category distribution chart"></div>
+              <div id="legendList" class="legend-list"></div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="panel transactions-panel">
+        <div class="panel-header panel-header-row">
+          <div>
+            <p class="section-label">Transactions</p>
+            <h3>Search, filter, and review every expense</h3>
+          </div>
+          <div class="filters">
+            <input id="searchInput" type="search" placeholder="Search expenses" />
+            <select id="categoryFilter">
+              <option value="All">All categories</option>
+              <option value="Food">Food</option>
+              <option value="Travel">Travel</option>
+              <option value="Shopping">Shopping</option>
+              <option value="Bills">Bills</option>
+              <option value="Education">Education</option>
+              <option value="Others">Others</option>
+            </select>
+            <input id="dateFilter" type="date" />
+          </div>
+        </div>
+
+        <div id="transactionList" class="transaction-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <template id="transactionTemplate">
+    <article class="transaction-item">
+      <div class="transaction-icon"></div>
+      <div class="transaction-main">
+        <div class="transaction-topline">
+          <strong class="transaction-name"></strong>
+          <span class="transaction-amount"></span>
+        </div>
+        <div class="transaction-meta">
+          <span class="transaction-category"></span>
+          <span class="transaction-date"></span>
+        </div>
+      </div>
+      <button class="remove-btn" type="button">Remove</button>
+    </article>
+  </template>
+
+  <script>
+    const STORAGE_KEY_PREFIX = "moneyMovesProState:";
+    const AUTH_USERS_KEY = "moneyMovesProUsers";
+    const AUTH_SESSION_KEY = "moneyMovesProSession";
+
+    const CATEGORY_META = {
+      Food: { icon: "🍽️", color: "#f59e0b" },
+      Travel: { icon: "✈️", color: "#06b6d4" },
+      Shopping: { icon: "🛍️", color: "#ec4899" },
+      Bills: { icon: "🧾", color: "#2563eb" },
+      Education: { icon: "📚", color: "#8b5cf6" },
+      Others: { icon: "✨", color: "#14b8a6" },
+    };
+
+    const state = {
+      budget: 5000,
+      expenses: [],
+      theme: "light",
+      budgetMode: "Monthly budget",
+      currentUser: null,
+    };
+
+    const els = {};
+    let lastAddedId = null;
+
+    function getStateKey(email) {
+      return `${STORAGE_KEY_PREFIX}${normalizeEmail(email)}`;
+    }
+
+    function normalizeEmail(value) {
+      return String(value || "").trim().toLowerCase();
+    }
+
+    function loadUsers() {
+      const raw = localStorage.getItem(AUTH_USERS_KEY);
+      if (!raw) {
+        return [
+          {
+            email: "demo@moneymoves.pro",
+            password: "Money123!",
+          },
+        ];
+      }
+
+      try {
+        const users = JSON.parse(raw);
+        return Array.isArray(users) && users.length ? users : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveUsers(users) {
+      localStorage.setItem(AUTH_USERS_KEY, JSON.stringify(users));
+    }
+
+    function loadSession() {
+      return localStorage.getItem(AUTH_SESSION_KEY) || "";
+    }
+
+    function loadAccountState(email) {
+      const raw = localStorage.getItem(getStateKey(email));
+
+      if (!raw) {
+        state.budget = 5000;
+        state.expenses = [];
+        state.theme = "light";
+        state.budgetMode = "Monthly budget";
+        return todayISO();
+      }
+
+      try {
+        const saved = JSON.parse(raw);
+        state.budget = Number(saved.budget ?? 5000);
+        state.expenses = Array.isArray(saved.expenses) ? saved.expenses : [];
+        state.theme = saved.theme === "dark" ? "dark" : "light";
+        state.budgetMode = saved.budgetMode || "Monthly budget";
+        return saved.lastDate || todayISO();
+      } catch {
+        state.budget = 5000;
+        state.expenses = [];
+        state.theme = "light";
+        state.budgetMode = "Monthly budget";
+        return todayISO();
+      }
+    }
+
+    function saveAccountState() {
+      if (!state.currentUser) return;
+
+      localStorage.setItem(
+        getStateKey(state.currentUser),
+        JSON.stringify({
+          budget: state.budget,
+          expenses: state.expenses,
+          theme: state.theme,
+          budgetMode: state.budgetMode,
+          lastDate: els.expenseDate?.value || todayISO(),
+        })
+      );
+    }
+
+    function setSession(email) {
+      if (state.currentUser) {
+        saveAccountState();
+      }
+
+      localStorage.setItem(AUTH_SESSION_KEY, email);
+      state.currentUser = email;
+      loadAccountState(email);
+      updateAuthView();
+    }
+
+    function clearSession() {
+      saveAccountState();
+      localStorage.removeItem(AUTH_SESSION_KEY);
+      state.currentUser = null;
+      updateAuthView();
+    }
+
+    function setAuthMessage(message, tone = "info") {
+      if (!els.authMessage) return;
+      els.authMessage.textContent = message;
+      els.authMessage.className = `auth-message ${tone}`;
+    }
+
+    function updateAuthView() {
+      const signedIn = Boolean(state.currentUser);
+      document.body.dataset.authenticated = signedIn ? "true" : "false";
+
+      if (els.currentUserLabel) {
+        els.currentUserLabel.textContent = signedIn ? "Account active" : "Not signed in";
+      }
+
+      if (!signedIn) {
+        setAuthMessage("Use the demo account or create a local account.");
+      }
+    }
+
+    function authenticate(email, password, shouldCreateAccount = false) {
+      const normalizedEmail = normalizeEmail(email);
+      const trimmedPassword = String(password || "").trim();
+
+      if (!normalizedEmail || !trimmedPassword) {
+        setAuthMessage("Enter both email and password.", "error");
+        return;
+      }
+
+      const users = loadUsers();
+      const existingUser = users.find((user) => normalizeEmail(user.email) === normalizedEmail);
+
+      if (shouldCreateAccount) {
+        if (existingUser) {
+          setAuthMessage("An account with this email already exists.", "error");
+          return;
+        }
+
+        users.push({ email: normalizedEmail, password: trimmedPassword });
+        saveUsers(users);
+        setSession(normalizedEmail);
+        setAuthMessage("Account created. You are now signed in.", "success");
+        return;
+      }
+
+      if (!existingUser || existingUser.password !== trimmedPassword) {
+        setAuthMessage("Invalid email or password.", "error");
+        return;
+      }
+
+      setSession(normalizedEmail);
+      setAuthMessage("Welcome back.", "success");
+    }
+
+    function formatCurrency(value) {
+      return `PKR ${new Intl.NumberFormat("en-PK", {
+        maximumFractionDigits: 2,
+      }).format(Number(value || 0))}`;
+    }
+
+    function formatDate(dateString) {
+      if (!dateString) return "No date";
+      const date = new Date(`${dateString}T00:00:00`);
+      return new Intl.DateTimeFormat(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      }).format(date);
+    }
+
+    function todayISO() {
+      return new Date().toISOString().split("T")[0];
+    }
+
+    function loadState() {
+      if (state.currentUser) {
+        return loadAccountState(state.currentUser);
+      }
+
+      state.budget = 5000;
+      state.expenses = [];
+      state.theme = "light";
+      state.budgetMode = "Monthly budget";
+      return todayISO();
+    }
+
+    function saveState() {
+      saveAccountState();
+    }
+
+    function getFilteredExpenses() {
+      const query = els.searchInput.value.trim().toLowerCase();
+      const category = els.categoryFilter.value;
+      const dateFilter = els.dateFilter.value;
+
+      return state.expenses.filter((expense) => {
+        const matchesQuery =
+          !query ||
+          expense.name.toLowerCase().includes(query) ||
+          expense.category.toLowerCase().includes(query);
+
+        const matchesCategory = category === "All" || expense.category === category;
+        const matchesDate = !dateFilter || expense.date === dateFilter;
+
+        return matchesQuery && matchesCategory && matchesDate;
+      });
+    }
+
+    function getCategoryTotals(expenses) {
+      return expenses.reduce((accumulator, expense) => {
+        accumulator[expense.category] = (accumulator[expense.category] || 0) + Number(expense.amount || 0);
+        return accumulator;
+      }, {});
+    }
+
+    function getMetrics() {
+      const totalExpenses = state.expenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0);
+      const remaining = state.budget - totalExpenses;
+      const usage = state.budget > 0 ? Math.min((totalExpenses / state.budget) * 100, 999) : 0;
+      const categoryTotals = getCategoryTotals(state.expenses);
+      const topCategory = Object.entries(categoryTotals).sort((a, b) => b[1] - a[1])[0] || ["None yet", 0];
+
+      return {
+        totalExpenses,
+        remaining,
+        usage,
+        categoryTotals,
+        topCategory,
+      };
+    }
+
+    function updateTheme() {
+      document.body.dataset.theme = state.theme;
+      els.themeToggle.textContent = state.theme === "dark" ? "Light mode" : "Dark mode";
+    }
+
+    function updateStatus(metrics) {
+      const overBudget = metrics.remaining < 0;
+      const usageRounded = Math.round(metrics.usage);
+
+      if (state.budget <= 0) {
+        els.statusBadge.textContent = "Set a budget";
+        els.statusBadge.className = "status-badge warn-text";
+        els.statusSummary.textContent = "Enter your budget to unlock live tracking and insights.";
+        els.insightText.textContent = "No budget set yet";
+        return;
+      }
+
+      if (overBudget) {
+        els.statusBadge.textContent = "Overspending";
+        els.statusBadge.className = "status-badge danger-text";
+        els.statusSummary.textContent = `You are over budget by ${formatCurrency(Math.abs(metrics.remaining))}.`;
+        els.insightText.textContent = "You are overspending";
+        return;
+      }
+
+      if (usageRounded >= 80) {
+        els.statusBadge.textContent = "Watch spending";
+        els.statusBadge.className = "status-badge warn-text";
+        els.statusSummary.textContent = `You have used ${usageRounded}% of your budget.`;
+        els.insightText.textContent = "Spending is getting close to the limit";
+        return;
+      }
+
+      els.statusBadge.textContent = "Safe spending";
+      els.statusBadge.className = "status-badge safe-text";
+      els.statusSummary.textContent = `You have ${formatCurrency(metrics.remaining)} remaining in your budget.`;
+      els.insightText.textContent = "You are within budget";
+    }
+
+    function renderSummary(metrics) {
+      els.budgetValue.textContent = formatCurrency(state.budget);
+      els.expenseValue.textContent = formatCurrency(metrics.totalExpenses);
+      els.remainingValue.textContent = formatCurrency(metrics.remaining);
+      els.usagePercent.textContent = `${Math.round(metrics.usage)}%`;
+      els.usageMeta.textContent = `${Math.round(metrics.usage)}% of your budget used`;
+      els.budgetMeta.textContent = state.budget > 0 ? `Budget mode: ${state.budgetMode}` : "Set your monthly budget to begin";
+      els.budgetModeChip.textContent = state.budgetMode;
+
+      const ringPct = state.budget > 0 ? Math.min(metrics.usage, 100) : 0;
+      els.progressRing.style.setProperty("--pct", `${ringPct}`);
+      els.progressRing.style.background = `conic-gradient(${metrics.remaining < 0 ? "#dc2626" : "var(--primary)"} ${ringPct}%, rgba(148, 163, 184, 0.18) 0)`;
+
+      updateStatus(metrics);
+    }
+
+    function getCategoryIcon(category) {
+      return CATEGORY_META[category]?.icon || "💸";
+    }
+
+    function renderTransactions() {
+      const filtered = getFilteredExpenses();
+      els.transactionList.innerHTML = "";
+
+      if (!filtered.length) {
+        const empty = document.createElement("article");
+        empty.className = "transaction-item empty";
+        empty.textContent = "No transactions match your search and filters.";
+        els.transactionList.appendChild(empty);
+        return;
+      }
+
+      filtered
+        .slice()
+        .sort((a, b) => new Date(b.date) - new Date(a.date))
+        .forEach((expense) => {
+          const template = document.getElementById("transactionTemplate");
+          const node = template.content.firstElementChild.cloneNode(true);
+          node.dataset.id = expense.id;
+
+          const icon = node.querySelector(".transaction-icon");
+          const name = node.querySelector(".transaction-name");
+          const amount = node.querySelector(".transaction-amount");
+          const category = node.querySelector(".transaction-category");
+          const date = node.querySelector(".transaction-date");
+          const removeBtn = node.querySelector(".remove-btn");
+
+          icon.textContent = getCategoryIcon(expense.category);
+          icon.style.background = `${CATEGORY_META[expense.category]?.color || "#2563eb"}20`;
+          name.textContent = expense.name;
+          amount.textContent = formatCurrency(expense.amount);
+          category.textContent = expense.category;
+          date.textContent = formatDate(expense.date);
+          removeBtn.addEventListener("click", () => removeExpense(expense.id));
+
+          if (expense.id === lastAddedId) {
+            node.classList.add("fade-in");
+          }
+
+          if (expense.amount > state.budget * 0.1 && state.budget > 0) {
+            node.classList.add("highlight");
+          }
+
+          els.transactionList.appendChild(node);
+        });
+    }
+
+    function renderCharts(metrics) {
+      const entries = Object.entries(metrics.categoryTotals).sort((a, b) => b[1] - a[1]);
+      els.categoryCount.textContent = `${entries.length} categories`;
+      els.topCategory.textContent = entries.length ? `${entries[0][0]} (${formatCurrency(entries[0][1])})` : "None yet";
+
+      if (!entries.length) {
+        els.chartHint.textContent = "No data available";
+        els.pieChart.style.background = "conic-gradient(var(--primary) 0 0)";
+        els.legendList.innerHTML = `<div class="legend-item"><span>No expenses recorded yet.</span><span>${formatCurrency(0)}</span></div>`;
+        return;
+      }
+
+      const total = entries.reduce((sum, [, amount]) => sum + amount, 0);
+      const palette = ["#2563eb", "#14b8a6", "#f59e0b", "#ec4899", "#8b5cf6", "#06b6d4"];
+      let cursor = 0;
+      const segments = entries.map(([category, amount], index) => {
+        const percent = (amount / total) * 100;
+        const start = cursor;
+        cursor += percent;
+        return `${palette[index % palette.length]} ${start}% ${cursor}%`;
+      });
+
+      els.pieChart.style.background = `conic-gradient(${segments.join(", ")})`;
+      els.chartHint.textContent = `${entries.length} active categories`;
+      els.legendList.innerHTML = entries
+        .map(([category, amount], index) => {
+          const percent = ((amount / total) * 100).toFixed(1);
+          return `
+            <div class="legend-item">
+              <div class="legend-left">
+                <span class="legend-swatch" style="background:${palette[index % palette.length]}"></span>
+                <span class="legend-name">${category}</span>
+              </div>
+              <span class="legend-value">${formatCurrency(amount)} (${percent}%)</span>
+            </div>
+          `;
+        })
+        .join("");
+    }
+
+    function renderApp() {
+      const metrics = getMetrics();
+      renderSummary(metrics);
+      renderTransactions();
+      renderCharts(metrics);
+      saveAccountState();
+    }
+
+    function addExpense(event) {
+      event.preventDefault();
+
+      const name = els.expenseName.value.trim();
+      const amount = Number(els.expenseAmount.value);
+      const category = els.expenseCategory.value;
+      const date = els.expenseDate.value || todayISO();
+
+      if (!name || !amount || amount <= 0) return;
+
+      const expense = {
+        id: crypto.randomUUID(),
+        name,
+        amount,
+        category,
+        date,
+      };
+
+      state.expenses.push(expense);
+      lastAddedId = expense.id;
+      els.expenseForm.reset();
+      els.expenseDate.value = todayISO();
+      renderApp();
+    }
+
+    function removeExpense(id) {
+      state.expenses = state.expenses.filter((expense) => expense.id !== id);
+      renderApp();
+    }
+
+    function updateBudget(event) {
+      event.preventDefault();
+      const nextBudget = Number(els.budgetInput.value);
+      if (Number.isNaN(nextBudget) || nextBudget < 0) return;
+      state.budget = nextBudget;
+      state.budgetMode = nextBudget > 0 ? "Monthly budget" : "Custom budget";
+      renderApp();
+      els.budgetInput.value = "";
+    }
+
+    function exportData() {
+      const data = {
+        budget: state.budget,
+        expenses: state.expenses,
+        theme: state.theme,
+        budgetMode: state.budgetMode,
+        exportedAt: new Date().toISOString(),
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "money-moves-pro-backup.json";
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    function clearData() {
+      if (!confirm("Clear all budgets and expenses from this device?")) return;
+      if (state.currentUser) {
+        localStorage.removeItem(getStateKey(state.currentUser));
+      }
+      state.budget = 0;
+      state.expenses = [];
+      state.theme = "light";
+      state.budgetMode = "Monthly budget";
+      els.expenseDate.value = todayISO();
+      els.searchInput.value = "";
+      els.categoryFilter.value = "All";
+      els.dateFilter.value = "";
+      renderApp();
+    }
+
+    function resetMonth() {
+      if (!confirm("Reset this month's expenses while keeping your budget?")) return;
+      state.expenses = [];
+      renderApp();
+    }
+
+    function bindEvents() {
+      els.expenseForm.addEventListener("submit", addExpense);
+      els.budgetForm.addEventListener("submit", updateBudget);
+      els.exportBtn.addEventListener("click", exportData);
+      els.clearBtn.addEventListener("click", clearData);
+      els.resetMonthBtn.addEventListener("click", resetMonth);
+      els.themeToggle.addEventListener("click", () => {
+        state.theme = state.theme === "dark" ? "light" : "dark";
+        updateTheme();
+        saveState();
+      });
+
+      [els.searchInput, els.categoryFilter, els.dateFilter].forEach((control) => {
+        control.addEventListener("input", renderApp);
+        control.addEventListener("change", renderApp);
+      });
+
+      document.querySelectorAll(".nav-link").forEach((button) => {
+        button.addEventListener("click", () => {
+          document.querySelectorAll(".nav-link").forEach((item) => item.classList.remove("active"));
+          button.classList.add("active");
+          const target = document.getElementById(button.dataset.scrollTarget);
+          target?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+    }
+
+    function init() {
+      els.authShell = document.getElementById("authShell");
+      els.authForm = document.getElementById("authForm");
+      els.authEmail = document.getElementById("authEmail");
+      els.authPassword = document.getElementById("authPassword");
+      els.authMessage = document.getElementById("authMessage");
+      els.loginBtn = document.getElementById("loginBtn");
+      els.signupBtn = document.getElementById("signupBtn");
+      els.themeToggle = document.getElementById("themeToggle");
+      els.resetMonthBtn = document.getElementById("resetMonthBtn");
+      els.exportBtn = document.getElementById("exportBtn");
+      els.logoutBtn = document.getElementById("logoutBtn");
+      els.clearBtn = document.getElementById("clearBtn");
+      els.switchAccountBtn = document.getElementById("switchAccountBtn");
+      els.currentUserLabel = document.getElementById("currentUserLabel");
+      els.statusBadge = document.getElementById("statusBadge");
+      els.statusSummary = document.getElementById("statusSummary");
+      els.insightText = document.getElementById("insightText");
+      els.budgetValue = document.getElementById("budgetValue");
+      els.expenseValue = document.getElementById("expenseValue");
+      els.remainingValue = document.getElementById("remainingValue");
+      els.usagePercent = document.getElementById("usagePercent");
+      els.usageMeta = document.getElementById("usageMeta");
+      els.budgetMeta = document.getElementById("budgetMeta");
+      els.budgetModeChip = document.getElementById("budgetModeChip");
+      els.progressRing = document.getElementById("progressRing");
+      els.budgetForm = document.getElementById("budgetForm");
+      els.budgetInput = document.getElementById("budgetInput");
+      els.expenseForm = document.getElementById("expenseForm");
+      els.expenseName = document.getElementById("expenseName");
+      els.expenseAmount = document.getElementById("expenseAmount");
+      els.expenseCategory = document.getElementById("expenseCategory");
+      els.expenseDate = document.getElementById("expenseDate");
+      els.searchInput = document.getElementById("searchInput");
+      els.categoryFilter = document.getElementById("categoryFilter");
+      els.dateFilter = document.getElementById("dateFilter");
+      els.transactionList = document.getElementById("transactionList");
+      els.pieChart = document.getElementById("pieChart");
+      els.legendList = document.getElementById("legendList");
+      els.topCategory = document.getElementById("topCategory");
+      els.categoryCount = document.getElementById("categoryCount");
+      els.chartHint = document.getElementById("chartHint");
+      els.monthChip = document.getElementById("monthChip");
+
+      state.currentUser = loadSession() || null;
+      const firstDate = loadState();
+      updateTheme();
+      els.expenseDate.value = firstDate;
+      els.monthChip.textContent = new Intl.DateTimeFormat(undefined, { month: "long", year: "numeric" }).format(new Date());
+      els.budgetInput.value = state.budget || "";
+      updateAuthView();
+      bindEvents();
+      els.authForm?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        authenticate(els.authEmail.value, els.authPassword.value, false);
+        if (state.currentUser) {
+          renderApp();
+        }
+      });
+      els.signupBtn?.addEventListener("click", () => {
+        authenticate(els.authEmail.value, els.authPassword.value, true);
+        if (state.currentUser) {
+          renderApp();
+        }
+      });
+      els.logoutBtn?.addEventListener("click", () => {
+        clearSession();
+        els.authPassword.value = "";
+        els.authMessage.textContent = "You have been logged out.";
+        document.body.dataset.authenticated = "false";
+      });
+      els.switchAccountBtn?.addEventListener("click", () => {
+        clearSession();
+        els.authEmail.focus();
+        els.authMessage.textContent = "Enter another account to sign in.";
+        document.body.dataset.authenticated = "false";
+      });
+      renderApp();
+    }
+
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>
