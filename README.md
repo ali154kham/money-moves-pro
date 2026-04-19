@@ -12,4 +12,4 @@ Money Moves Pro is a simple, modern browser app for personal finance management.
 
 ## Run locally
 
-Open `/home/runner/work/money-moves-pro/money-moves-pro/index.html` in any modern browser.
+Open `index.html` in any modern browser.
