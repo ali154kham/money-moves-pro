@@ -1,2 +1,15 @@
 # money-moves-pro
-Money Moves Pro is a web-based application designed to help users manage their personal finances in a simple and organized way. The app allows users to track income and expenses, view their financial records, and stay aware of their spending habits. 
+
+Money Moves Pro is a simple, modern browser app for personal finance management.
+
+## Features
+
+- Add, edit, and delete income/expense transactions
+- View transaction history in a clean list
+- See total income, total expenses, and remaining balance
+- Responsive layout for desktop and mobile
+- Local storage persistence (data remains after refresh)
+
+## Run locally
+
+Open `index.html` in any modern browser.
